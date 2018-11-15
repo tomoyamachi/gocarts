@@ -19,7 +19,7 @@ go-cas summarizes alerts by CVE ID. You can search alert's detail by CVE ID.
 
 ```
 $ gocarts
-X-CERT alerts summarize
+X-CERT alerts summarizer
 
 Usage:
   gost [command]
