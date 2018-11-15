@@ -16,13 +16,13 @@ func RetrieveJPCERT() (cves models.JpcertCveKeyMap, err error) {
 	return cves, nil
 }
 
-func retrieveYearJPCERT(year int) (alertBodies map[string]string, err error)  {
-	alertBodies= map[string]string{}
+func retrieveYearJPCERT(year int) (alertBodies map[string]string, err error) {
+	alertBodies = map[string]string{}
 	// count up when doesn't exist text data
 	continueDontExist := 0
 
 	// 連続して10回リンクがなければ、その年は終了
-	for seqId := 1; continueDontExist< 10; seqId++ {
+	for seqId := 1; continueDontExist < 10; seqId++ {
 		articleID := fmt.Sprintf("%d%04d", year%100, seqId)
 		url := fmt.Sprintf("https://www.jpcert.or.jp/at/%d/at%s.txt", year, articleID)
 		log15.Info("Fetching", "URL", url)
@@ -36,5 +36,5 @@ func retrieveYearJPCERT(year int) (alertBodies map[string]string, err error)  {
 			continueDontExist = 0
 		}
 	}
-	return alertBodies,nil
+	return alertBodies, nil
 }
