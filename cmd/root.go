@@ -8,8 +8,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-var cfgFile string
-
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
 	Use:           "gocarts",
@@ -41,4 +39,3 @@ func init() {
 	viper.BindPFlag("http-proxy", RootCmd.PersistentFlags().Lookup("http-proxy"))
 	viper.SetDefault("http-proxy", "")
 }
-

@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"github.com/inconshreveable/log15"
-	"github.com/tomoyamachi/gocarts/fetcher"
 	"github.com/spf13/cobra"
+	"github.com/tomoyamachi/gocarts/fetcher"
 )
 
 // debianCmd represents the debian command
