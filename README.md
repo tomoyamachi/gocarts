@@ -1,5 +1,5 @@
 # gocarts(go-CERT-alerts-summarizer)
-[![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/tomoyamachi/cery/blob/master/LICENSE)
+[![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/tomoyamachi/gocarts/blob/master/LICENSE)
 
 `gocarts` checks alerts of X-CERT (e.g. [JPCERT](http://www.jpcert.or.jp/), [US-CERT](https://www.us-cert.gov/ncas/alerts).
 
@@ -25,11 +25,8 @@ Usage:
   gost [command]
 
 Available Commands:
-  fetch       Fetch the data of the security tracker
-  help        Help about any command
-  notify      Notifiy update abount the specified CVE
-  register    Register CVEs to monitor
-  server      Start security tracker HTTP server
+  fetch     Fetch the data of the X-CERT alerts
+  tui       Search alerts by CVE ID in TUI
 
 Flags:
       --dbpath string       /path/to/sqlite3 or SQL connection string
@@ -37,8 +34,6 @@ Flags:
       --debug               debug mode (default: false)
       --debug-sql           SQL debug mode
   -h, --help                help for go-cas
-      --log-dir string      /path/to/log
-      --log-json            output log as JSON
 
 Use "gocarts [command] --help" for more information about a command.
 ```
