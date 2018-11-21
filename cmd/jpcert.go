@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/tomoyamachi/gocarts/db"
 	"github.com/tomoyamachi/gocarts/fetcher"
+	"github.com/tomoyamachi/gocarts/util"
 )
 
 // debianCmd represents the debian command
@@ -13,14 +14,18 @@ var jpcertCmd = &cobra.Command{
 	Use:   "jpcert",
 	Short: "Fetch alerts from JPCERT",
 	Long:  `Fetch alerts from JPCERT`,
-	RunE:  fetchJP,
+	RunE:  fetchJpcert,
 }
 
 func init() {
 	fetchCmd.AddCommand(jpcertCmd)
+
+	jpcertCmd.PersistentFlags().String("after", "", "Fetch articles after the specified year (e.g. 2017) (default: 2015)")
+	viper.BindPFlag("after", jpcertCmd.PersistentFlags().Lookup("after"))
+	viper.SetDefault("after", "2015")
 }
 
-func fetchJP(cmd *cobra.Command, args []string) (err error) {
+func fetchJpcert(cmd *cobra.Command, args []string) (err error) {
 	log15.Info("Initialize Database")
 	driver, locked, err := db.NewDB(viper.GetString("dbtype"), viper.GetString("dbpath"), viper.GetBool("debug-sql"))
 
@@ -32,7 +37,7 @@ func fetchJP(cmd *cobra.Command, args []string) (err error) {
 	}
 
 	log15.Info("Fetched alerts from JPCERT")
-	articles, err := fetcher.RetrieveJPCERT()
+	articles, err := fetcher.RetrieveJPCERT(util.ToIntOr0(viper.GetString("after"), 2015))
 
 	log15.Info("Insert article into DB", "db", driver.Name())
 	if err := driver.InsertJpcert(articles); err != nil {

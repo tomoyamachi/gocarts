@@ -6,31 +6,52 @@ import (
 	"github.com/tomoyamachi/gocarts/models"
 	"github.com/tomoyamachi/gocarts/util"
 	"regexp"
+	"time"
 )
 
 // https://security-tracker.debian.org/tracker/data/json
-func RetrieveJPCERT() ([]models.JpcertArticle, error) {
+func RetrieveJPCERT(after int) ([]models.JpcertArticle, error) {
 	articles := []models.JpcertArticle{}
 
-	// TODO : 指定した年のURLをfor分で回して取得
-	alerts, _ := retrieveYearJPCERT(2018)
-	for articleID, txt := range alerts {
-		//cveIDs := findCveIDs(txt)
-		date, title := detectEachPart(txt)
-		articles = append(
-			articles,
-			models.JpcertArticle{
-				ArticleID:   articleID,
-				Title:       title,
-				Body:        txt,
-				PublishDate: date,
-				Cves:        []models.JpcertCve{},
+	t := time.Now()
+	thisYear := t.Year()
+	// up to current year
+	for year := after; year <= thisYear; year++ {
+
+		// fetch alart pages
+		alerts, _ := retrieveYearJPCERT(year)
+		for articleID, txt := range alerts {
+			cveIDs := findCveIDs(txt)
+			date, title := detectEachPart(txt)
+			articles = append(
+				articles,
+				models.JpcertArticle{
+					ArticleID:   articleID,
+					Title:       title,
+					Body:        txt,
+					PublishDate: date,
+					JpcertCves:  convertCveIDsToCve(articleID, cveIDs),
+				},
+			)
+
+		}
+	}
+
+	return articles, nil
+}
+
+func convertCveIDsToCve(articleID string, cveIDs []string) []models.JpcertCve {
+	cves := []models.JpcertCve{}
+	for _, cveID := range cveIDs {
+		cves = append(
+			cves,
+			models.JpcertCve{
+				CveID:     cveID,
+				ArticleID: articleID,
 			},
 		)
-
 	}
-	fmt.Printf("%v", articles)
-	return articles, nil
+	return cves
 }
 
 var datePattern = regexp.MustCompile(`JPCERT/CC Alert (?P<date>\d{4}-\d{2}-\d{2})\s*>>>\s*(?P<title>.*)`)
@@ -59,8 +80,7 @@ func retrieveYearJPCERT(year int) (alertBodies map[string]string, err error) {
 	continueDontExist := 0
 
 	// 連続して10回リンクがなければ、その年は終了
-	for seqId := 40; seqId < 42; seqId++ {
-		//for seqId := 1; continueDontExist < 1; seqId++ {
+	for seqId := 1; continueDontExist < 1; seqId++ {
 		articleID := fmt.Sprintf("%d%04d", year%100, seqId)
 		url := fmt.Sprintf("https://www.jpcert.or.jp/at/%d/at%s.txt", year, articleID)
 		log15.Info("Fetching", "URL", url)

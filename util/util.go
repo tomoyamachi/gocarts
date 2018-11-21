@@ -8,6 +8,7 @@ import (
 	"golang.org/x/text/transform"
 	"io"
 	"io/ioutil"
+	"strconv"
 	"strings"
 )
 
@@ -41,6 +42,15 @@ func RemoveDuplicateFromSlice(args []string) []string {
 		}
 	}
 	return results
+}
+
+func ToIntOr0(arg string, notExist int) int {
+	var i int
+	var err error
+	if i, err = strconv.Atoi(arg); err == nil {
+		return i
+	}
+	return notExist
 }
 
 func transformEncoding(rawReader io.Reader, trans transform.Transformer) (string, error) {
