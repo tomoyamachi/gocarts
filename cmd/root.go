@@ -29,7 +29,7 @@ func init() {
 	RootCmd.PersistentFlags().String("dbpath", "", "/path/to/sqlite3 or SQL connection string")
 	viper.BindPFlag("dbpath", RootCmd.PersistentFlags().Lookup("dbpath"))
 	pwd := os.Getenv("PWD")
-	viper.SetDefault("dbpath", filepath.Join(pwd, "gost.sqlite3"))
+	viper.SetDefault("dbpath", filepath.Join(pwd, "gocarts.sqlite3"))
 
 	RootCmd.PersistentFlags().String("dbtype", "", "Database type to store data in (sqlite3, mysql or postgres supported)")
 	viper.BindPFlag("dbtype", RootCmd.PersistentFlags().Lookup("dbtype"))
