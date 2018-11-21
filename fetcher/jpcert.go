@@ -8,28 +8,36 @@ import (
 	"regexp"
 )
 
-var re = regexp.MustCompile(`CVE-[0-9]+-[0-9]+`)
-
 // https://security-tracker.debian.org/tracker/data/json
 func RetrieveJPCERT() (cves models.JpcertCveKeyMap, err error) {
 	cves = models.JpcertCveKeyMap{} //map[models.CveID][]models.ArticleID{}
 	// TODO : 指定した年のURLをfor分で回して取得
-	alerts, _ := retrieveYearJPCERT(2017)
-
+	alerts, _ := retrieveYearJPCERT(2018)
 	for articleID, body := range alerts {
-		addArticleIDtoCveMap(cves, models.ArticleID(articleID), body)
+		cveIDs := findCveIDs(body)
+		addArticleIDtoCveMap(cves, models.ArticleID(articleID), cveIDs)
 	}
 	fmt.Printf("%q", cves)
 	return cves, nil
 }
 
-// TODO : ポインタ渡しのほうがいいのでは
-func addArticleIDtoCveMap(cves models.JpcertCveKeyMap, articleID models.ArticleID, body string) models.JpcertCveKeyMap {
-	rawMatches := re.FindAllString(body, -1)
+// return CVE slice mathed from alert's body
+var cvePattern = regexp.MustCompile(`CVE-[0-9]+-[0-9]+`)
+
+func findCveIDs(body string) []models.CveID {
+	cveIDs := []models.CveID{}
+	rawMatches := cvePattern.FindAllString(body, -1)
 	matches := util.RemoveDuplicateFromSlice(rawMatches)
 	for _, cveID := range matches {
-		cves[models.CveID(cveID)] = append(
-			returnOrCreateCveSlice(cves, models.CveID(cveID)),
+		cveIDs = append(cveIDs, models.CveID(cveID))
+	}
+	return cveIDs
+}
+
+func addArticleIDtoCveMap(cves models.JpcertCveKeyMap, articleID models.ArticleID, cveIDs []models.CveID) models.JpcertCveKeyMap {
+	for _, cveID := range cveIDs {
+		cves[cveID] = append(
+			returnOrCreateCveSlice(cves, cveID),
 			articleID,
 		)
 	}
