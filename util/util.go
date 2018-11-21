@@ -20,3 +20,20 @@ func FetchURL(url string) ([]byte, error) {
 	}
 	return body, nil
 }
+
+func RemoveDuplicateFromSlice(args []string) []string {
+	results := make([]string, 0, len(args))
+	for i := 0; i < len(args); i++ {
+		dup := false
+		for j := 0; j < len(results); j++ {
+			if args[i] == results[j] {
+				dup = true
+				break
+			}
+		}
+		if !dup {
+			results = append(results, args[i])
+		}
+	}
+	return results
+}
