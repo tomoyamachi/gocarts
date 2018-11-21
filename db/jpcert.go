@@ -9,6 +9,7 @@ import (
 )
 
 func (r *RDBDriver) deleteAndInsertJpcert(conn *gorm.DB, article models.JpcertArticle) (err error) {
+
 	tx := conn.Begin()
 	defer func() {
 		if err != nil {
@@ -20,10 +21,13 @@ func (r *RDBDriver) deleteAndInsertJpcert(conn *gorm.DB, article models.JpcertAr
 
 	// Delete old records if found
 	old := models.JpcertArticle{}
-	result := tx.Where(&models.JpcertArticle{ArticleID: article.ArticleID}).First(&old)
+	result := tx.Where("article_id = ?", article.ArticleID).First(&old)
 	if !result.RecordNotFound() {
 		// Delete old records
 		var errs gorm.Errors
+		errs = errs.Add(
+			tx.Where("article_id = ?", article.ArticleID).Delete(models.JpcertCve{}).Error,
+		)
 		errs = errs.Add(tx.Unscoped().Delete(&old).Error)
 
 		// Delete nil in errs
