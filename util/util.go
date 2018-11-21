@@ -4,6 +4,11 @@ import (
 	"fmt"
 	"github.com/parnurzeal/gorequest"
 	"github.com/spf13/viper"
+	"golang.org/x/text/encoding/japanese"
+	"golang.org/x/text/transform"
+	"io"
+	"io/ioutil"
+	"strings"
 )
 
 // FetchURL returns HTTP response body
@@ -36,4 +41,18 @@ func RemoveDuplicateFromSlice(args []string) []string {
 		}
 	}
 	return results
+}
+
+func transformEncoding(rawReader io.Reader, trans transform.Transformer) (string, error) {
+	ret, err := ioutil.ReadAll(transform.NewReader(rawReader, trans))
+	if err == nil {
+		return string(ret), nil
+	} else {
+		return "", err
+	}
+}
+
+// Convert a string encoding from ShiftJIS to UTF-8
+func FromISO2022JP(str string) (string, error) {
+	return transformEncoding(strings.NewReader(str), japanese.ISO2022JP.NewDecoder())
 }
