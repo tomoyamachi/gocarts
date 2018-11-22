@@ -4,7 +4,7 @@ import "time"
 
 // アプリとしては利用しない予定
 type JpcertAlert struct {
-	AlertID     string `gorm:"index"`
+	AlertID     uint `gorm:"primary_key"`
 	Title       string
 	URL         string
 	PublishDate time.Time
@@ -14,5 +14,5 @@ type JpcertAlert struct {
 type JpcertCve struct {
 	ID      uint   `gorm:"primary_key"`
 	CveID   string `gorm:"index"`
-	AlertID string `gorm:"index"`
+	AlertID uint   `gorm:"index"`
 }

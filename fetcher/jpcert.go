@@ -21,7 +21,7 @@ func RetrieveJpcert(after int) (articles []models.JpcertAlert, err error) {
 			cveIDs := findCveIDs(txt)
 			if dateString, title, err := detectEachPart(txt); err == nil {
 				date, _ := time.Parse("2006-01-02", dateString)
-				articleID := fmt.Sprintf("%d%04d", year, seqId)
+				articleID := uint(year*10000 + seqId)
 				url := generateUrl(year, seqId)
 				articles = append(
 					articles,
@@ -41,7 +41,7 @@ func RetrieveJpcert(after int) (articles []models.JpcertAlert, err error) {
 	return articles, nil
 }
 
-func convertCveIDsToCve(articleID string, cveIDs []string) (cves []models.JpcertCve) {
+func convertCveIDsToCve(articleID uint, cveIDs []string) (cves []models.JpcertCve) {
 	for _, cveID := range cveIDs {
 		cves = append(
 			cves,
