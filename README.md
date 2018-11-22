@@ -1,10 +1,11 @@
 # gocarts(go-CERT-alerts-summarizer)
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/tomoyamachi/gocarts/blob/master/LICENSE)
 
-`gocarts` checks alerts of X-CERT (e.g. [JPCERT](http://www.jpcert.or.jp/), [US-CERT](https://www.us-cert.gov/ncas/alerts))
+`gocarts` checks alerts of X-CERT (e.g. [JPCERT](http://www.jpcert.or.jp/), [US-CERT](https://www.us-cert.gov/ncas/alerts)).<br/>
+This project refers to [knqyf263/gost](https://github.com/knqyf263/gost).
 
 # Abstract
-`gocarts` is written in Go, and therefore you can just grab the binary releases and drop it in your $PATH.
+`gocarts` is written in Go, and therefore you can just grab the binary releases and drop it in your `$PATH`.
 
 gocarts summarizes alerts by CVE ID. You can search alert's detail by CVE ID.
 
