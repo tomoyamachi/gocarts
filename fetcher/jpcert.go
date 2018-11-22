@@ -17,7 +17,7 @@ func RetrieveJpcert(after int) (articles []models.JpcertAlert, err error) {
 	for year := after; year <= thisYear; year++ {
 
 		// fetch alart pages
-		alerts, _ := retrieveYearJPCERT(year)
+		alerts, _ := retrieveYearJpcert(year)
 		for articleID, txt := range alerts {
 			cveIDs := findCveIDs(txt)
 			if date, title, err := detectEachPart(txt); err == nil {
@@ -76,7 +76,7 @@ func findCveIDs(body string) (cveIDs []string) {
 	return cveIDs
 }
 
-func retrieveYearJPCERT(year int) (alertBodies map[string]string, err error) {
+func retrieveYearJpcert(year int) (alertBodies map[string]string, err error) {
 	alertBodies = map[string]string{}
 	// count up when doesn't exist text data
 	continueDontExist := 0
