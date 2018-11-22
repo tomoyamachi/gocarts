@@ -34,8 +34,4 @@ func init() {
 	RootCmd.PersistentFlags().String("dbtype", "", "Database type to store data in (sqlite3, mysql or postgres supported)")
 	viper.BindPFlag("dbtype", RootCmd.PersistentFlags().Lookup("dbtype"))
 	viper.SetDefault("dbtype", "sqlite3")
-
-	RootCmd.PersistentFlags().String("http-proxy", "", "http://proxy-url:port (default: empty)")
-	viper.BindPFlag("http-proxy", RootCmd.PersistentFlags().Lookup("http-proxy"))
-	viper.SetDefault("http-proxy", "")
 }

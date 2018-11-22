@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/inconshreveable/log15"
 	"github.com/tomoyamachi/gocarts/models"
+	"time"
 )
 
 // DB is interface for a database driver
@@ -12,6 +13,7 @@ type DB interface {
 	OpenDB(string, string, bool) (bool, error)
 	MigrateDB() error
 	InsertJpcert([]models.JpcertAlert) error
+	GetAfterTimeJpcert(time.Time) ([]models.JpcertAlert, error)
 }
 
 // NewDB returns db driver

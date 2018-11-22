@@ -5,7 +5,8 @@ import (
 	"github.com/inconshreveable/log15"
 	"github.com/jinzhu/gorm"
 	"github.com/tomoyamachi/gocarts/models"
-	pb "gopkg.in/cheggaaa/pb.v1"
+	"gopkg.in/cheggaaa/pb.v1"
+	"time"
 )
 
 func (r *RDBDriver) deleteAndInsertJpcert(conn *gorm.DB, alert models.JpcertAlert) (err error) {
@@ -48,6 +49,22 @@ func (r *RDBDriver) deleteAndInsertJpcert(conn *gorm.DB, alert models.JpcertAler
 		return err
 	}
 	return nil
+}
+
+func (r *RDBDriver) GetAfterTimeJpcert(after time.Time) (allAlerts []models.JpcertAlert, err error) {
+	all := []models.JpcertAlert{}
+	if err = r.conn.Where("publish_date >= ?", after.Format("2006-01-02")).Find(&all).Error; err != nil {
+		return nil, err
+	}
+
+	for _, a := range all {
+		cves := []models.JpcertCve{}
+		r.conn.Where("alert_id = ?", a.AlertID).Find(&cves)
+		a.JpcertCves = cves
+		//r.conn.Model(&a).Related(&a.JpcertCves)
+		allAlerts = append(allAlerts, a)
+	}
+	return allAlerts, nil
 }
 
 func (r *RDBDriver) InsertJpcert(alerts []models.JpcertAlert) (err error) {
