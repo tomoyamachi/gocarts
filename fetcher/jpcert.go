@@ -15,19 +15,20 @@ func RetrieveJpcert(after int) (articles []models.JpcertAlert, err error) {
 	thisYear := time.Now().Year()
 	// up to current year
 	for year := after; year <= thisYear; year++ {
-
 		// fetch alart pages
 		alerts, _ := retrieveYearJpcert(year)
-		for articleID, txt := range alerts {
+		for seqId, txt := range alerts {
 			cveIDs := findCveIDs(txt)
-			if date, title, err := detectEachPart(txt); err == nil {
-
+			if dateString, title, err := detectEachPart(txt); err == nil {
+				date, _ := time.Parse("2006-01-02", dateString)
+				articleID := fmt.Sprintf("%d%04d", year, seqId)
+				url := generateUrl(year, seqId)
 				articles = append(
 					articles,
 					models.JpcertAlert{
 						AlertID:     articleID,
 						Title:       title,
-						Body:        txt,
+						URL:         url,
 						PublishDate: date,
 						JpcertCves:  convertCveIDsToCve(articleID, cveIDs),
 					},
@@ -76,15 +77,20 @@ func findCveIDs(body string) (cveIDs []string) {
 	return cveIDs
 }
 
-func retrieveYearJpcert(year int) (alertBodies map[string]string, err error) {
-	alertBodies = map[string]string{}
+func generateUrl(year int, id int) (url string) {
+	articleID := fmt.Sprintf("%02d%04d", year%100, id)
+	url = fmt.Sprintf("https://www.jpcert.or.jp/at/%d/at%s.txt", year, articleID)
+	return url
+}
+
+func retrieveYearJpcert(year int) (alertBodies map[int]string, err error) {
 	// count up when doesn't exist text data
+	alertBodies = map[int]string{}
 	continueDontExist := 0
 
 	// 連続して10回リンクがなければ、その年は終了
 	for seqId := 1; continueDontExist < 10; seqId++ {
-		articleID := fmt.Sprintf("%02d%04d", year%100, seqId)
-		url := fmt.Sprintf("https://www.jpcert.or.jp/at/%d/at%s.txt", year, articleID)
+		url := generateUrl(year, seqId)
 		log15.Info("Fetching", "URL", url)
 		text, err := util.FetchURL(url)
 
@@ -93,7 +99,7 @@ func retrieveYearJpcert(year int) (alertBodies map[string]string, err error) {
 			continueDontExist++
 		} else {
 			// convert ISO-2022-JP to UTF-8
-			if alertBodies[articleID], err = util.FromISO2022JP(string(text)); err != nil {
+			if alertBodies[seqId], err = util.FromISO2022JP(string(text)); err != nil {
 				log15.Error("something occured ", "ERR", err)
 			} else {
 				continueDontExist = 0

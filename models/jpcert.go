@@ -1,11 +1,13 @@
 package models
 
+import "time"
+
 // アプリとしては利用しない予定
 type JpcertAlert struct {
 	AlertID     string `gorm:"index"`
 	Title       string
-	Body        string      `gorm:"type:text;"`
-	PublishDate string      //time.Time
+	URL         string
+	PublishDate time.Time
 	JpcertCves  []JpcertCve `gorm:"foreignkey:AlertID;association_foreignkey:AlertID"`
 }
 
