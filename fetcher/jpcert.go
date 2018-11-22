@@ -11,7 +11,7 @@ import (
 )
 
 // https://security-tracker.debian.org/tracker/data/json
-func RetrieveJPCERT(after int) (articles []models.JpcertAlert, err error) {
+func RetrieveJpcert(after int) (articles []models.JpcertAlert, err error) {
 	thisYear := time.Now().Year()
 	// up to current year
 	for year := after; year <= thisYear; year++ {
@@ -40,8 +40,7 @@ func RetrieveJPCERT(after int) (articles []models.JpcertAlert, err error) {
 	return articles, nil
 }
 
-func convertCveIDsToCve(articleID string, cveIDs []string) []models.JpcertCve {
-	cves := []models.JpcertCve{}
+func convertCveIDsToCve(articleID string, cveIDs []string) (cves []models.JpcertCve) {
 	for _, cveID := range cveIDs {
 		cves = append(
 			cves,
@@ -70,7 +69,7 @@ var cvePattern = regexp.MustCompile(`CVE-[0-9]+-[0-9]+`)
 
 func findCveIDs(body string) (cveIDs []string) {
 	rawMatches := cvePattern.FindAllString(body, -1)
-	matches := util.RemoveDuplicateFromSlice(rawMatches)
+	matches := util.UniqueStrings(rawMatches)
 	for _, cveID := range matches {
 		cveIDs = append(cveIDs, cveID)
 	}

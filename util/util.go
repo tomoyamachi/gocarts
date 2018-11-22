@@ -26,7 +26,7 @@ func FetchURL(url string) ([]byte, error) {
 	return body, nil
 }
 
-func RemoveDuplicateFromSlice(args []string) (newSlice []string) {
+func UniqueStrings(args []string) (newSlice []string) {
 	uniq := map[string]struct{}{}
 	for _, arg := range args {
 		if _, ok := uniq[arg]; ok {

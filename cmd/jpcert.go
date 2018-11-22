@@ -35,8 +35,8 @@ func fetchJpcert(cmd *cobra.Command, args []string) (err error) {
 		return err
 	}
 
-	log15.Info("Fetched alerts from JPCERT")
-	articles, err := fetcher.RetrieveJPCERT(viper.GetInt("after"))
+	log15.Info("Fetched alerts from JP-CERT")
+	articles, err := fetcher.RetrieveJpcert(viper.GetInt("after"))
 
 	log15.Info("Insert article into DB", "db", driver.Name())
 	if err := driver.InsertJpcert(articles); err != nil {

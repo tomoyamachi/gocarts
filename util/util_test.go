@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestRemoveDuplicateFromSlice(t *testing.T) {
+func TestUniqueStrings(t *testing.T) {
 	checkExpectedValue(
 		t,
 		[]string{"a", "b", "a"},
@@ -33,7 +33,7 @@ func TestRemoveDuplicateFromSlice(t *testing.T) {
 }
 
 func checkExpectedValue(t *testing.T, args []string, expected []string) {
-	removed := RemoveDuplicateFromSlice(args)
+	removed := UniqueStrings(args)
 	if reflect.DeepEqual(removed, expected) == false {
 		t.Fatalf("Should return %q, but got %q", expected, removed)
 	}
