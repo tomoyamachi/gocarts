@@ -11,7 +11,7 @@ type DB interface {
 	Name() string
 	OpenDB(string, string, bool) (bool, error)
 	MigrateDB() error
-	InsertJpcert([]models.JpcertArticle) error
+	InsertJpcert([]models.JpcertAlert) error
 }
 
 // NewDB returns db driver

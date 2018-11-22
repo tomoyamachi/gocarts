@@ -8,7 +8,7 @@ import (
 	pb "gopkg.in/cheggaaa/pb.v1"
 )
 
-func (r *RDBDriver) deleteAndInsertJpcert(conn *gorm.DB, article models.JpcertArticle) (err error) {
+func (r *RDBDriver) deleteAndInsertJpcert(conn *gorm.DB, alert models.JpcertAlert) (err error) {
 
 	tx := conn.Begin()
 	defer func() {
@@ -20,13 +20,13 @@ func (r *RDBDriver) deleteAndInsertJpcert(conn *gorm.DB, article models.JpcertAr
 	}()
 
 	// Delete old records if found
-	old := models.JpcertArticle{}
-	result := tx.Where("article_id = ?", article.ArticleID).First(&old)
+	old := models.JpcertAlert{}
+	result := tx.Where("alert_id = ?", alert.AlertID).First(&old)
 	if !result.RecordNotFound() {
 		// Delete old records
 		var errs gorm.Errors
 		errs = errs.Add(
-			tx.Where("article_id = ?", article.ArticleID).Delete(models.JpcertCve{}).Error,
+			tx.Where("alert_id = ?", alert.AlertID).Delete(models.JpcertCve{}).Error,
 		)
 		errs = errs.Add(tx.Unscoped().Delete(&old).Error)
 
@@ -41,22 +41,22 @@ func (r *RDBDriver) deleteAndInsertJpcert(conn *gorm.DB, article models.JpcertAr
 
 		if len(errs.GetErrors()) > 0 {
 			return fmt.Errorf("Failed to delete old records. id: %s, err: %s",
-				article.ArticleID, errs.Error())
+				alert.AlertID, errs.Error())
 		}
 	}
-	if err = tx.Create(&article).Error; err != nil {
+	if err = tx.Create(&alert).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r *RDBDriver) InsertJpcert(articles []models.JpcertArticle) (err error) {
-	bar := pb.StartNew(len(articles))
-	log15.Info(fmt.Sprintf("Insert %d articles", len(articles)))
-	for _, article := range articles {
-		if err := r.deleteAndInsertJpcert(r.conn, article); err != nil {
-			return fmt.Errorf("Failed to insert. article: %s, err: %s",
-				article.ArticleID, err)
+func (r *RDBDriver) InsertJpcert(alerts []models.JpcertAlert) (err error) {
+	bar := pb.StartNew(len(alerts))
+	log15.Info(fmt.Sprintf("Insert %d alerts", len(alerts)))
+	for _, alert := range alerts {
+		if err := r.deleteAndInsertJpcert(r.conn, alert); err != nil {
+			return fmt.Errorf("Failed to insert. alert: %s, err: %s",
+				alert.AlertID, err)
 		}
 		bar.Increment()
 	}

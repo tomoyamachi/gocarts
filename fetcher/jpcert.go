@@ -10,8 +10,8 @@ import (
 )
 
 // https://security-tracker.debian.org/tracker/data/json
-func RetrieveJPCERT(after int) ([]models.JpcertArticle, error) {
-	articles := []models.JpcertArticle{}
+func RetrieveJPCERT(after int) ([]models.JpcertAlert, error) {
+	articles := []models.JpcertAlert{}
 
 	t := time.Now()
 	thisYear := t.Year()
@@ -25,8 +25,8 @@ func RetrieveJPCERT(after int) ([]models.JpcertArticle, error) {
 			date, title := detectEachPart(txt)
 			articles = append(
 				articles,
-				models.JpcertArticle{
-					ArticleID:   articleID,
+				models.JpcertAlert{
+					AlertID:     articleID,
 					Title:       title,
 					Body:        txt,
 					PublishDate: date,
@@ -46,8 +46,8 @@ func convertCveIDsToCve(articleID string, cveIDs []string) []models.JpcertCve {
 		cves = append(
 			cves,
 			models.JpcertCve{
-				CveID:     cveID,
-				ArticleID: articleID,
+				CveID:   cveID,
+				AlertID: articleID,
 			},
 		)
 	}
