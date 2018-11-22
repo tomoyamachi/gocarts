@@ -49,5 +49,16 @@ func transformEncoding(rawReader io.Reader, trans transform.Transformer) (string
 
 // Convert a string encoding from ISO2022JP to UTF-8
 func FromISO2022JP(str string) (string, error) {
-	return transformEncoding(strings.NewReader(str), japanese.ISO2022JP.NewDecoder())
+	ret, err := ioutil.ReadAll(
+		transform.NewReader(
+			strings.NewReader(str),
+			japanese.ISO2022JP.NewDecoder(),
+		),
+	)
+	if err != nil {
+		return "", err
+	} else {
+		return string(ret), nil
+	}
+
 }
