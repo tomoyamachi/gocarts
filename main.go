@@ -12,7 +12,6 @@ import (
 var revision string
 
 func main() {
-	//sfetcher.RetrieveJPCERT()
 	var v = flag.Bool("v", false, "Show version")
 	flag.Parse()
 	if *v {

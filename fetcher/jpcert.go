@@ -11,8 +11,7 @@ import (
 )
 
 // https://security-tracker.debian.org/tracker/data/json
-func RetrieveJPCERT(after int) ([]models.JpcertAlert, error) {
-	articles := []models.JpcertAlert{}
+func RetrieveJPCERT(after int) (articles []models.JpcertAlert, err error) {
 	thisYear := time.Now().Year()
 	// up to current year
 	for year := after; year <= thisYear; year++ {
@@ -69,8 +68,7 @@ func detectEachPart(txt string) (date string, title string, err error) {
 // return CVE slice mathed from alert's body
 var cvePattern = regexp.MustCompile(`CVE-[0-9]+-[0-9]+`)
 
-func findCveIDs(body string) []string {
-	cveIDs := []string{}
+func findCveIDs(body string) (cveIDs []string) {
 	rawMatches := cvePattern.FindAllString(body, -1)
 	matches := util.RemoveDuplicateFromSlice(rawMatches)
 	for _, cveID := range matches {
@@ -86,7 +84,7 @@ func retrieveYearJPCERT(year int) (alertBodies map[string]string, err error) {
 
 	// 連続して10回リンクがなければ、その年は終了
 	for seqId := 1; continueDontExist < 10; seqId++ {
-		articleID := fmt.Sprintf("%d%04d", year%100, seqId)
+		articleID := fmt.Sprintf("%02d%04d", year%100, seqId)
 		url := fmt.Sprintf("https://www.jpcert.or.jp/at/%d/at%s.txt", year, articleID)
 		log15.Info("Fetching", "URL", url)
 		text, err := util.FetchURL(url)
