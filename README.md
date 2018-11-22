@@ -4,6 +4,8 @@
 `gocarts` checks alerts of X-CERT (e.g. [JPCERT](http://www.jpcert.or.jp/), [US-CERT](https://www.us-cert.gov/ncas/alerts)).<br/>
 This project refers to [knqyf263/gost](https://github.com/knqyf263/gost).
 
+<img src="img/gocarts.gif" width="700">
+
 # Abstract
 `gocarts` is written in Go, and therefore you can just grab the binary releases and drop it in your `$PATH`.
 
