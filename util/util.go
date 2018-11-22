@@ -8,7 +8,6 @@ import (
 	"golang.org/x/text/transform"
 	"io"
 	"io/ioutil"
-	"strconv"
 	"strings"
 )
 
@@ -44,25 +43,16 @@ func RemoveDuplicateFromSlice(args []string) []string {
 	return results
 }
 
-func ToIntOr0(arg string, notExist int) int {
-	var i int
-	var err error
-	if i, err = strconv.Atoi(arg); err == nil {
-		return i
-	}
-	return notExist
-}
-
 func transformEncoding(rawReader io.Reader, trans transform.Transformer) (string, error) {
 	ret, err := ioutil.ReadAll(transform.NewReader(rawReader, trans))
-	if err == nil {
-		return string(ret), nil
-	} else {
+	if err != nil {
 		return "", err
+	} else {
+		return string(ret), nil
 	}
 }
 
-// Convert a string encoding from ShiftJIS to UTF-8
+// Convert a string encoding from ISO2022JP to UTF-8
 func FromISO2022JP(str string) (string, error) {
 	return transformEncoding(strings.NewReader(str), japanese.ISO2022JP.NewDecoder())
 }

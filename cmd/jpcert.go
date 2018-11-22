@@ -6,7 +6,6 @@ import (
 	"github.com/spf13/viper"
 	"github.com/tomoyamachi/gocarts/db"
 	"github.com/tomoyamachi/gocarts/fetcher"
-	"github.com/tomoyamachi/gocarts/util"
 )
 
 // debianCmd represents the debian command
@@ -37,7 +36,7 @@ func fetchJpcert(cmd *cobra.Command, args []string) (err error) {
 	}
 
 	log15.Info("Fetched alerts from JPCERT")
-	articles, err := fetcher.RetrieveJPCERT(util.ToIntOr0(viper.GetString("after"), 2015))
+	articles, err := fetcher.RetrieveJPCERT(viper.GetInt("after"))
 
 	log15.Info("Insert article into DB", "db", driver.Name())
 	if err := driver.InsertJpcert(articles); err != nil {
