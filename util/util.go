@@ -6,7 +6,6 @@ import (
 	"github.com/spf13/viper"
 	"golang.org/x/text/encoding/japanese"
 	"golang.org/x/text/transform"
-	"io"
 	"io/ioutil"
 	"strings"
 )
@@ -36,15 +35,6 @@ func UniqueStrings(args []string) (newSlice []string) {
 		newSlice = append(newSlice, arg)
 	}
 	return newSlice
-}
-
-func transformEncoding(rawReader io.Reader, trans transform.Transformer) (string, error) {
-	ret, err := ioutil.ReadAll(transform.NewReader(rawReader, trans))
-	if err != nil {
-		return "", err
-	} else {
-		return string(ret), nil
-	}
 }
 
 // Convert a string encoding from ISO2022JP to UTF-8
