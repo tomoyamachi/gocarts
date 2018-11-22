@@ -26,21 +26,16 @@ func FetchURL(url string) ([]byte, error) {
 	return body, nil
 }
 
-func RemoveDuplicateFromSlice(args []string) []string {
-	results := make([]string, 0, len(args))
-	for i := 0; i < len(args); i++ {
-		dup := false
-		for j := 0; j < len(results); j++ {
-			if args[i] == results[j] {
-				dup = true
-				break
-			}
+func RemoveDuplicateFromSlice(args []string) (newSlice []string) {
+	uniq := map[string]struct{}{}
+	for _, arg := range args {
+		if _, ok := uniq[arg]; ok {
+			continue
 		}
-		if !dup {
-			results = append(results, args[i])
-		}
+		uniq[arg] = struct{}{}
+		newSlice = append(newSlice, arg)
 	}
-	return results
+	return newSlice
 }
 
 func transformEncoding(rawReader io.Reader, trans transform.Transformer) (string, error) {

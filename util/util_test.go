@@ -24,10 +24,11 @@ func TestRemoveDuplicateFromSlice(t *testing.T) {
 		[]string{"a"},
 	)
 
+	var emptySlice []string
 	checkExpectedValue(
 		t,
 		[]string{},
-		[]string{},
+		emptySlice,
 	)
 }
 
