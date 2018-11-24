@@ -54,15 +54,21 @@ func convertCveIDsToCve(articleID uint, cveIDs []string) (cves []models.JpcertCv
 	return cves
 }
 
-var datePattern = regexp.MustCompile(`JPCERT/CC Alert (?P<date>\d{4}-\d{2}-\d{2})\s*>>>\s*(?P<title>.*)`)
+var datePattern = regexp.MustCompile(`\d{4}-\d{2}-\d{2}`)
+var titlePattern = regexp.MustCompile(`<h3>(?P<title>.*)</h3>`)
 
 func detectEachPart(txt string) (date string, title string, err error) {
-	if matches := datePattern.FindStringSubmatch(txt); matches != nil {
-		if len(matches) > 2 {
-			return matches[1], matches[2], nil
-		}
+	if dateMatch := datePattern.FindStringSubmatch(txt); dateMatch != nil {
+		date = dateMatch[0]
+	} else {
+		return "", "", errors.New("Cant detect date format")
 	}
-	return "", "", errors.New("invalid text")
+	if titleMatch := titlePattern.FindStringSubmatch(txt); titleMatch != nil {
+		title = titleMatch[1]
+	} else {
+		return "", "", errors.New("Cant detect title format")
+	}
+	return date, title, nil
 }
 
 // return CVE slice mathed from alert's body
@@ -77,10 +83,15 @@ func findCveIDs(body string) (cveIDs []string) {
 	return cveIDs
 }
 
-func generateUrl(year int, id int) (url string) {
+func generateUrl(year int, id int) string {
+	// https://www.jpcert.or.jp/at/199x/99-0002-02.txt
+	if year < 2000 {
+		articleID := fmt.Sprintf("%02d-%04d-01", year%100, id)
+		return fmt.Sprintf("https://www.jpcert.or.jp/at/199x/%s.html", year, articleID)
+	}
+	// https://www.jpcert.or.jp/at/2010/at100033.txt
 	articleID := fmt.Sprintf("%02d%04d", year%100, id)
-	url = fmt.Sprintf("https://www.jpcert.or.jp/at/%d/at%s.txt", year, articleID)
-	return url
+	return fmt.Sprintf("https://www.jpcert.or.jp/at/%d/at%s.html", year, articleID)
 }
 
 func retrieveYearJpcert(year int) (alertBodies map[int]string, err error) {
@@ -98,12 +109,8 @@ func retrieveYearJpcert(year int) (alertBodies map[int]string, err error) {
 		if err != nil {
 			continueDontExist++
 		} else {
-			// convert ISO-2022-JP to UTF-8
-			if alertBodies[seqId], err = util.FromISO2022JP(string(text)); err != nil {
-				log15.Error("something occured ", "ERR", err)
-			} else {
-				continueDontExist = 0
-			}
+			alertBodies[seqId] = string(text)
+			continueDontExist = 0
 		}
 	}
 	return alertBodies, nil
