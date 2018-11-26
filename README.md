@@ -45,14 +45,18 @@ X-CERT alerts summarizer
 ## Fetch alarts updated after 2016
 
 ```
-$ gocarts fetch jpcert --after 2016
-
+$ gocarts fetch jp --after 2016
 ....
 ```
 
 # Fetch USCERT
 
-TODO
+## Fetch alarts updated after 2016
+
+```
+$ gocarts fetch us --after 2016
+....
+```
 
 # Search mode
 
