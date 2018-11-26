@@ -77,7 +77,7 @@ func searchAlert(cmd *cobra.Command, args []string) (err error) {
 				"%s | %s | %-60s | %s",
 				alert.PublishDate.Format("2006-01-02"),
 				alert.URL,
-				runewidth.Truncate(convertCvesToText(alert.JpcertCves), 60, "…"),
+				runewidth.Truncate(convertCvesToText(alert.Cves), 60, "…"),
 				alert.Title,
 			),
 		)
@@ -88,7 +88,7 @@ func searchAlert(cmd *cobra.Command, args []string) (err error) {
 	return err
 }
 
-func convertCvesToText(cves []models.JpcertCve) (cveText string) {
+func convertCvesToText(cves []models.Cve) (cveText string) {
 	if len(cves) == 0 {
 		return "..."
 	}

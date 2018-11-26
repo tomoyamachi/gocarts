@@ -4,11 +4,18 @@ import (
 	"fmt"
 	"github.com/parnurzeal/gorequest"
 	"github.com/spf13/viper"
+	"github.com/tomoyamachi/gocarts/models"
 	"golang.org/x/text/encoding/japanese"
 	"golang.org/x/text/transform"
 	"io/ioutil"
 	"strings"
 )
+
+// Create ID
+func ReturnArticleID(year int, id int, team string) uint {
+	teamNumber := models.TEAM_PREFIX_ID[team]
+	return uint(teamNumber*100000000 + year*10000 + id)
+}
 
 // FetchURL returns HTTP response body
 func FetchURL(url string) ([]byte, error) {

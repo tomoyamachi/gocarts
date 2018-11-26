@@ -10,8 +10,7 @@ import (
 	"time"
 )
 
-// https://security-tracker.debian.org/tracker/data/json
-func RetrieveJpcert(after int) (articles []models.JpcertAlert, err error) {
+func RetrieveJpcert(after int) (articles []models.Alert, err error) {
 	thisYear := time.Now().Year()
 	// up to current year
 	for year := after; year <= thisYear; year++ {
@@ -21,16 +20,17 @@ func RetrieveJpcert(after int) (articles []models.JpcertAlert, err error) {
 			cveIDs := findCveIDs(txt)
 			if dateString, title, err := detectEachPart(txt); err == nil {
 				date, _ := time.Parse("2006-01-02", dateString)
-				articleID := uint(year*10000 + seqId)
+				articleID := util.ReturnArticleID(year, seqId, models.TEAM_JPCERT)
 				url := generateUrl(year, seqId)
 				articles = append(
 					articles,
-					models.JpcertAlert{
+					models.Alert{
 						AlertID:     articleID,
+						Team:        models.TEAM_JPCERT,
 						Title:       title,
 						URL:         url,
 						PublishDate: date,
-						JpcertCves:  convertCveIDsToCve(articleID, cveIDs),
+						Cves:        convertCveIDsToCve(articleID, cveIDs),
 					},
 				)
 			}
@@ -41,11 +41,11 @@ func RetrieveJpcert(after int) (articles []models.JpcertAlert, err error) {
 	return articles, nil
 }
 
-func convertCveIDsToCve(articleID uint, cveIDs []string) (cves []models.JpcertCve) {
+func convertCveIDsToCve(articleID uint, cveIDs []string) (cves []models.Cve) {
 	for _, cveID := range cveIDs {
 		cves = append(
 			cves,
-			models.JpcertCve{
+			models.Cve{
 				CveID:   cveID,
 				AlertID: articleID,
 			},

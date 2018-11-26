@@ -55,8 +55,8 @@ func (r *RDBDriver) OpenDB(dbType, dbPath string, debugSQL bool) (locked bool, e
 func (r *RDBDriver) MigrateDB() error {
 	//TODO Add FetchMeta
 	if err := r.conn.AutoMigrate(
-		&models.JpcertAlert{},
-		&models.JpcertCve{},
+		&models.Alert{},
+		&models.Cve{},
 	).Error; err != nil {
 		return fmt.Errorf("Failed to migrate. err: %s", err)
 	}

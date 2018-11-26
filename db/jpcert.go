@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func (r *RDBDriver) deleteAndInsertJpcert(conn *gorm.DB, alert models.JpcertAlert) (err error) {
+func (r *RDBDriver) deleteAndInsertJpcert(conn *gorm.DB, alert models.Alert) (err error) {
 
 	tx := conn.Begin()
 	defer func() {
@@ -21,13 +21,13 @@ func (r *RDBDriver) deleteAndInsertJpcert(conn *gorm.DB, alert models.JpcertAler
 	}()
 
 	// Delete old records if found
-	old := models.JpcertAlert{}
+	old := models.Alert{}
 	result := tx.Where("alert_id = ?", alert.AlertID).First(&old)
 	if !result.RecordNotFound() {
 		// Delete old records
 		var errs gorm.Errors
 		errs = errs.Add(
-			tx.Where("alert_id = ?", alert.AlertID).Delete(models.JpcertCve{}).Error,
+			tx.Where("alert_id = ?", alert.AlertID).Delete(models.Cve{}).Error,
 		)
 		errs = errs.Add(tx.Unscoped().Delete(&old).Error)
 
@@ -51,23 +51,23 @@ func (r *RDBDriver) deleteAndInsertJpcert(conn *gorm.DB, alert models.JpcertAler
 	return nil
 }
 
-func (r *RDBDriver) GetAfterTimeJpcert(after time.Time) (allAlerts []models.JpcertAlert, err error) {
-	all := []models.JpcertAlert{}
+func (r *RDBDriver) GetAfterTimeJpcert(after time.Time) (allAlerts []models.Alert, err error) {
+	all := []models.Alert{}
 	if err = r.conn.Where("publish_date >= ?", after.Format("2006-01-02")).Find(&all).Error; err != nil {
 		return nil, err
 	}
 
 	for _, a := range all {
-		cves := []models.JpcertCve{}
+		cves := []models.Cve{}
 		r.conn.Where("alert_id = ?", a.AlertID).Find(&cves)
-		a.JpcertCves = cves
-		//r.conn.Model(&a).Related(&a.JpcertCves)
+		a.Cves = cves
+		//r.conn.Model(&a).Related(&a.Cves)
 		allAlerts = append(allAlerts, a)
 	}
 	return allAlerts, nil
 }
 
-func (r *RDBDriver) InsertJpcert(alerts []models.JpcertAlert) (err error) {
+func (r *RDBDriver) InsertJpcert(alerts []models.Alert) (err error) {
 	bar := pb.StartNew(len(alerts))
 	log15.Info(fmt.Sprintf("Insert %d alerts", len(alerts)))
 	for _, alert := range alerts {

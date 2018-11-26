@@ -10,7 +10,7 @@ import (
 
 // debianCmd represents the debian command
 var jpcertCmd = &cobra.Command{
-	Use:   "jpcert",
+	Use:   "jp",
 	Short: "Fetch alerts from JPCERT",
 	Long:  `Fetch alerts from JPCERT`,
 	RunE:  fetchJpcert,
