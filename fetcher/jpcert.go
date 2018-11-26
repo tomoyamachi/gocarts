@@ -87,7 +87,7 @@ func generateUrl(year int, id int) string {
 	// https://www.jpcert.or.jp/at/199x/99-0002-02.txt
 	if year < 2000 {
 		articleID := fmt.Sprintf("%02d-%04d-01", year%100, id)
-		return fmt.Sprintf("https://www.jpcert.or.jp/at/199x/%s.html", year, articleID)
+		return fmt.Sprintf("https://www.jpcert.or.jp/at/199x/%s.html", articleID)
 	}
 	// https://www.jpcert.or.jp/at/2010/at100033.txt
 	articleID := fmt.Sprintf("%02d%04d", year%100, id)

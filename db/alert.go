@@ -67,7 +67,7 @@ func (r *RDBDriver) GetAfterTimeJpcert(after time.Time) (allAlerts []models.Aler
 	return allAlerts, nil
 }
 
-func (r *RDBDriver) InsertJpcert(alerts []models.Alert) (err error) {
+func (r *RDBDriver) InsertAlert(alerts []models.Alert) (err error) {
 	bar := pb.StartNew(len(alerts))
 	log15.Info(fmt.Sprintf("Insert %d alerts", len(alerts)))
 	for _, alert := range alerts {

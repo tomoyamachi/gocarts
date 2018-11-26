@@ -12,7 +12,7 @@ type DB interface {
 	Name() string
 	OpenDB(string, string, bool) (bool, error)
 	MigrateDB() error
-	InsertJpcert([]models.Alert) error
+	InsertAlert([]models.Alert) error
 	GetAfterTimeJpcert(time.Time) ([]models.Alert, error)
 }
 

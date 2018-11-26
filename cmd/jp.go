@@ -17,11 +17,7 @@ var jpcertCmd = &cobra.Command{
 }
 
 func init() {
-	fetchCmd.AddCommand(jpcertCmd)
-
-	jpcertCmd.PersistentFlags().String("after", "", "Fetch articles after the specified year (e.g. 2017) (default: 2015)")
-	viper.BindPFlag("after", jpcertCmd.PersistentFlags().Lookup("after"))
-	viper.SetDefault("after", "2015")
+	FetchCmd.AddCommand(jpcertCmd)
 }
 
 func fetchJpcert(cmd *cobra.Command, args []string) (err error) {
@@ -36,14 +32,12 @@ func fetchJpcert(cmd *cobra.Command, args []string) (err error) {
 	}
 
 	log15.Info("Fetched alerts from JP-CERT")
-	articles, err := fetcher.RetrieveJpcert(viper.GetInt("after"))
+	alerts, err := fetcher.RetrieveJpcert(viper.GetInt("after"))
 
 	log15.Info("Insert article into DB", "db", driver.Name())
-	if err := driver.InsertJpcert(articles); err != nil {
+	if err := driver.InsertAlert(alerts); err != nil {
 		log15.Error("Failed to insert.", "dbpath", viper.GetString("dbpath"), "err", err)
 		return err
 	}
-	log15.Info("articles : ", articles)
-
 	return nil
 }
