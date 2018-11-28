@@ -14,6 +14,7 @@ type DB interface {
 	MigrateDB() error
 	InsertAlert([]models.Alert) error
 	GetAfterTimeJpcert(time.Time) ([]models.Alert, error)
+	GetAlertsByCveId(string) ([]models.Alert, error)
 }
 
 // NewDB returns db driver

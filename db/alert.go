@@ -51,20 +51,62 @@ func (r *RDBDriver) deleteAndInsertJpcert(conn *gorm.DB, alert models.Alert) (er
 	return nil
 }
 
+// Fecth alerts by CVE-ID and Team
+func (r *RDBDriver) GetAlertsByCveId(cveId string) (allAlerts []models.Alert, err error) {
+	// Fetch target id's reference data
+	refs := []models.Cve{}
+	if err = r.conn.Where("cve_id = ?", cveId).Find(&refs).Error; err != nil {
+		return nil, err
+	}
+	if len(refs) == 0 {
+		return allAlerts, nil
+	}
+
+	// Fetch from reference ids
+
+	// aggregate alert ids
+	alertIds := []uint{}
+	for _, ref := range refs {
+		alertIds = append(alertIds, ref.AlertID)
+	}
+
+	// get alerts from alert id
+	all := []models.Alert{}
+	if err = r.conn.Where("alert_id in (?)", alertIds).Find(&all).Error; err != nil {
+		return nil, err
+	}
+
+	if allAlerts, err = appendRelatedCves(r, all); err != nil {
+		return nil, err
+	}
+	return allAlerts, nil
+}
+
+// Fetch alerts by published date
 func (r *RDBDriver) GetAfterTimeJpcert(after time.Time) (allAlerts []models.Alert, err error) {
 	all := []models.Alert{}
 	if err = r.conn.Where("publish_date >= ?", after.Format("2006-01-02")).Find(&all).Error; err != nil {
 		return nil, err
 	}
 
-	for _, a := range all {
+	if allAlerts, err = appendRelatedCves(r, all); err != nil {
+		return nil, err
+	}
+	return allAlerts, nil
+}
+
+func appendRelatedCves(r *RDBDriver, alerts []models.Alert) (allAlerts []models.Alert, err error) {
+	for _, a := range alerts {
 		cves := []models.Cve{}
-		r.conn.Where("alert_id = ?", a.AlertID).Find(&cves)
+		//r.conn.Model(&a).Related(&a.Cves)  TODO : it didn't work.
+		if err = r.conn.Where("alert_id = ?", a.AlertID).Find(&cves).Error; err != nil {
+			return nil, err
+		}
 		a.Cves = cves
-		//r.conn.Model(&a).Related(&a.Cves)
 		allAlerts = append(allAlerts, a)
 	}
 	return allAlerts, nil
+
 }
 
 func (r *RDBDriver) InsertAlert(alerts []models.Alert) (err error) {
