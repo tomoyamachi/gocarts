@@ -35,7 +35,7 @@ var AlertDictUS = map[string][]AlertGolang {
         {
 	        CveID       : "{{$cveID}}",
 	        URL         : "{{$alert.URL}}",
-                Title       : "{{$alert.Title}}",
+            Title       : "{{$alert.Title}}",
 	        Team        : "us",
         },{{end}}
     },{{end}}
@@ -58,7 +58,7 @@ var AlertDictJP = map[string][]AlertGolang {
         {
 	        CveID       : "{{$cveID}}",
 	        URL         : "{{$alert.URL}}",
-                Title       : "{{$alert.Title}}",
+            Title       : "{{$alert.Title}}",
 	        Team        : "jp",
         },{{end}}
     },{{end}}
