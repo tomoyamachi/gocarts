@@ -14,7 +14,7 @@ import (
 // Create ID
 func ReturnArticleID(year int, id int, team string) uint {
 	teamNumber := models.TEAM_PREFIX_ID[team]
-	return uint(teamNumber*100000000 + year*10000 + id)
+	return uint(teamNumber*models.TEAM_ID_DIGIT + year*10000 + id)
 }
 
 // FetchURL returns HTTP response body

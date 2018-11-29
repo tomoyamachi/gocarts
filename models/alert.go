@@ -26,3 +26,5 @@ var TEAM_PREFIX_ID = map[string]int{
 	TEAM_JPCERT: 1,
 	TEAM_USCERT: 2,
 }
+
+const TEAM_ID_DIGIT = 100000000

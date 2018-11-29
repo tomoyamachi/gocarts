@@ -5,6 +5,7 @@ import (
 	"github.com/inconshreveable/log15"
 	"github.com/jinzhu/gorm"
 	"github.com/tomoyamachi/gocarts/models"
+	"github.com/tomoyamachi/gocarts/util"
 	"gopkg.in/cheggaaa/pb.v1"
 	"time"
 )
@@ -49,6 +50,35 @@ func (r *RDBDriver) deleteAndInsertJpcert(conn *gorm.DB, alert models.Alert) (er
 		return err
 	}
 	return nil
+}
+
+func (r *RDBDriver) GetAllAlertsCveIdKeyByTeam(team string) (alertsMap map[string][]models.Alert, err error) {
+	refs := []models.Cve{}
+	// alert_id's first char is depend on TEAM. check util.CreateID
+	searchID := models.TEAM_PREFIX_ID[team] * models.TEAM_ID_DIGIT
+	if err = r.conn.Where("alert_id between ? and ?", searchID, searchID+models.TEAM_ID_DIGIT).
+		Find(&refs).Error; err != nil {
+		return nil, err
+	}
+	if len(refs) == 0 {
+		return alertsMap, nil
+	}
+
+	// get unique cve id
+	cveIDs := ToUniqueCve(refs)
+	alertsMap = map[string][]models.Alert{}
+	for _, cveID := range cveIDs {
+		alerts, _ := r.GetAlertsByCveId(cveID)
+		alertsMap[cveID] = alerts
+	}
+	return alertsMap, nil
+}
+
+func ToUniqueCve(cves []models.Cve) (cveIDs []string) {
+	for _, cve := range cves {
+		cveIDs = append(cveIDs, cve.CveID)
+	}
+	return util.UniqueStrings(cveIDs)
 }
 
 // Fecth alerts by CVE-ID and Team

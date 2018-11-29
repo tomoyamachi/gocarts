@@ -15,6 +15,7 @@ type DB interface {
 	InsertAlert([]models.Alert) error
 	GetAfterTimeJpcert(time.Time) ([]models.Alert, error)
 	GetAlertsByCveId(string) ([]models.Alert, error)
+	GetAllAlertsCveIdKeyByTeam(string) (map[string][]models.Alert, error)
 }
 
 // NewDB returns db driver
@@ -24,15 +25,15 @@ func NewDB(dbType, dbPath string, debugSQL bool) (driver DB, locked bool, err er
 		return driver, false, err
 	}
 
-	log15.Info("Opening DB.", "db", driver.Name())
 	if locked, err := driver.OpenDB(dbType, dbPath, debugSQL); err != nil {
+		log15.Error("Failed to open db.", "err", err)
 		if locked {
+			log15.Error("db locked.", "err", err)
 			return nil, true, err
 		}
 		return nil, false, err
 	}
 
-	log15.Info("Migrating DB.", "db", driver.Name())
 	if err := driver.MigrateDB(); err != nil {
 		log15.Error("Failed to migrate db.", "err", err)
 		return driver, false, err
