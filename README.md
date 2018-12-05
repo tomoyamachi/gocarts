@@ -25,10 +25,13 @@ X-CERT alerts summarizer
 Usage:
   gocarts [command]
 
+
 Available Commands:
   fetch       Fetch X-CERT alerts
   help        Help about any command
+  output      Output alerts to stdout
   search      Search X-CERT alerts
+  server      Start alert information HTTP server
 
 Flags:
       --dbpath string   /path/to/sqlite3 or SQL connection string
@@ -100,6 +103,18 @@ $ search alert --select-after 2018-01-01
   2018-08-15 | https://www.jpcert.or.jp/at/2018/at180034.txt | CVE-2018-8266, CVE-2018-8273, CVE-2018-8302, CVE-2018-8344,… | 2018年 8月マイクロソフトセキュリティ更新プログラムに関する注意喚起
  
 
+```
+
+# Output Mode
+
+These data use in [future-architect/vuls](https://github.com/future-architect/vuls).
+
+```
+$ gocarts output --team us --output-type cve
+$ gocarts output --team us --output-type alert
+
+$ gocarts output --team jp --output-type cve
+$ gocarts output --team jp --output-type alert
 ```
 
 # License

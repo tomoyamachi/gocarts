@@ -10,7 +10,7 @@ import (
 	"github.com/tomoyamachi/gocarts/output"
 )
 
-// outputCmd represents the server command
+// outputCmd represents output golang file for future-architect/vuls
 var outputCmd = &cobra.Command{
 	Use:   "output",
 	Short: "Output alerts to stdout",
@@ -20,10 +20,13 @@ var outputCmd = &cobra.Command{
 
 func init() {
 	RootCmd.AddCommand(outputCmd)
-	outputCmd.PersistentFlags().String("team", "jp", "Output article from XX-CERT(e.g. jp, us)")
+	outputCmd.PersistentFlags().String("team", "jp", "Output data from XX-CERT(e.g. jp, us)")
 	viper.BindPFlag("team", outputCmd.PersistentFlags().Lookup("team"))
 	viper.SetDefault("team", "jp")
 
+	outputCmd.PersistentFlags().String("output-type", "cve", "Output data type(e.g. alert, cve)")
+	viper.BindPFlag("output-type", outputCmd.PersistentFlags().Lookup("output-type"))
+	viper.SetDefault("output-type", "cve")
 }
 
 func outputData(cmd *cobra.Command, args []string) (err error) {
@@ -34,20 +37,42 @@ func outputData(cmd *cobra.Command, args []string) (err error) {
 		}
 		return err
 	}
-
+	outputType := viper.GetString("output-type")
 	team := viper.GetString("team")
-	alerts, _ := driver.GetAllAlertsCveIdKeyByTeam(team)
 
 	var code string
-	if team == models.TEAM_JPCERT {
-		code, err = output.GenerateJP(alerts)
-	} else if team == models.TEAM_USCERT {
-		code, err = output.GenerateUS(alerts)
+	if outputType == "cve" {
+		code, err = outputCveDict(driver, team)
+	} else if outputType == "alert" {
+		code, err = outputAlertDict(driver, team)
+	} else {
+		err = fmt.Errorf("output-type error : %s", outputType)
 	}
 	if err != nil {
 		log15.Error("Failed to output file.", "err", err)
 		return err
 	}
+
 	fmt.Println(code)
 	return nil
+}
+
+func outputCveDict(driver db.DB, team string) (code string, err error) {
+	alerts, _ := driver.GetAllAlertsCveIdKeyByTeam(team)
+	if team == models.TEAM_JPCERT {
+		code, err = output.GenerateCveDictJP(alerts)
+	} else if team == models.TEAM_USCERT {
+		code, err = output.GenerateCveDictUS(alerts)
+	}
+	return code, err
+}
+
+func outputAlertDict(driver db.DB, team string) (code string, err error) {
+	alerts, _ := driver.GetTargetTeamAlerts(team)
+	if team == models.TEAM_JPCERT {
+		code, err = output.GenerateAlertDictJP(alerts)
+	} else if team == models.TEAM_USCERT {
+		code, err = output.GenerateAlertDictUS(alerts)
+	}
+	return code, err
 }

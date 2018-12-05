@@ -64,7 +64,7 @@ func searchAlert(cmd *cobra.Command, args []string) (err error) {
 	}
 
 	log15.Info("Select all Alerts")
-	allAlerts, err := driver.GetAfterTimeJpcert(after)
+	allAlerts, err := driver.GetAfterTimeAlerts(after)
 	if err != nil {
 		return err
 	}
