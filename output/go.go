@@ -49,7 +49,8 @@ func GenerateAlertDict(alerts []models.Alert, tmplstr string) (string, error) {
 
 const templateCveUS = `package alert
 
-var CveDictUS = map[string][]string {
+// CveDictEn has CVE-ID key which included USCERT alerts
+var CveDictEn = map[string][]string{
 {{range $cveID, $alerts := .}}
     "{{$cveID}}" : { {{range $alert := . -}}"{{$alert.URL}}",{{end}}},{{end}}
 }
@@ -57,7 +58,8 @@ var CveDictUS = map[string][]string {
 
 const templateCveJP = `package alert
 
-var CveDictJP = map[string][]string {
+// CveDictJa has CVE-ID key which included JPCERT alerts
+var CveDictJa = map[string][]string{
 {{range $cveID, $alerts := .}}
     "{{$cveID}}" : { {{range $alert := . -}}"{{$alert.URL}}",{{end}} },{{end}}
 }
@@ -72,12 +74,13 @@ type Alert struct {
 	Team        string
 }
 
-var AlertDictJP = map[string]Alert {
+// AlertDictJa has JPCERT alerts
+var AlertDictJa = map[string]Alert{
 {{range $alert := . -}}
     "{{$alert.URL}}" : { 
         URL         : "{{$alert.URL}}",
         Title       :  ` + "`" + `{{$alert.Title}}` + "`" + `,
-	    Team        : "us",
+	    Team        : "jp",
     },
 {{end}}
 }
@@ -85,7 +88,8 @@ var AlertDictJP = map[string]Alert {
 
 const templateAlertUS = `package alert
 
-var AlertDictUS = map[string]Alert {
+// AlertDictEn has USCERT alerts
+var AlertDictEn = map[string]Alert{
 {{range $alert := . -}}
     "{{$alert.URL}}" : {
         URL         : "{{$alert.URL}}",
