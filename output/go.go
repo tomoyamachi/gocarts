@@ -72,14 +72,12 @@ type Alert struct {
 	Team        string
 }
 
-var AlertDictJP = map[string][]Alert {
+var AlertDictJP = map[string]Alert {
 {{range $alert := . -}}
     "{{$alert.URL}}" : { 
-        {
-	        URL         : "{{$alert.URL}}",
-            Title       :  ` + "`" + `{{$alert.Title}}` + "`" + `,
-	        Team        : "jp",
-        },
+        URL         : "{{$alert.URL}}",
+        Title       :  ` + "`" + `{{$alert.Title}}` + "`" + `,
+	    Team        : "us",
     },
 {{end}}
 }
@@ -87,14 +85,12 @@ var AlertDictJP = map[string][]Alert {
 
 const templateAlertUS = `package alert
 
-var AlertDictUS = map[string][]Alert {
+var AlertDictUS = map[string]Alert {
 {{range $alert := . -}}
-    "{{$alert.URL}}" : { 
-        {
-	        URL         : "{{$alert.URL}}",
-            Title       :  ` + "`" + `{{$alert.Title}}` + "`" + `,
-	        Team        : "us",
-        },
+    "{{$alert.URL}}" : {
+        URL         : "{{$alert.URL}}",
+        Title       :  ` + "`" + `{{$alert.Title}}` + "`" + `,
+	    Team        : "us",
     },
 {{end}}
 }
