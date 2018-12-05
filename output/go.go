@@ -6,16 +6,36 @@ import (
 	"text/template"
 )
 
-func GenerateJP(alerts map[string][]models.Alert) (string, error) {
-	return Generate(alerts, templateJP)
+func GenerateCveDictJP(cves map[string][]models.Alert) (string, error) {
+	return GenerateCveDict(cves, templateCveJP)
 }
 
-func GenerateUS(alerts map[string][]models.Alert) (string, error) {
-	return Generate(alerts, templateUS)
+func GenerateCveDictUS(cves map[string][]models.Alert) (string, error) {
+	return GenerateCveDict(cves, templateCveUS)
+}
+
+func GenerateAlertDictJP(alerts []models.Alert) (string, error) {
+	return GenerateAlertDict(alerts, templateAlertJP)
+}
+
+func GenerateAlertDictUS(alerts []models.Alert) (string, error) {
+	return GenerateAlertDict(alerts, templateAlertUS)
 }
 
 // Generate go const definition
-func Generate(alerts map[string][]models.Alert, tmplstr string) (string, error) {
+func GenerateCveDict(cves map[string][]models.Alert, tmplstr string) (string, error) {
+	tmpl, err := template.New("detail").Parse(tmplstr)
+	if err != nil {
+		return "", err
+	}
+	buf := bytes.NewBuffer(nil) // create empty buffer
+	if err := tmpl.Execute(buf, cves); err != nil {
+		return "", err
+	}
+	return string(buf.Bytes()), nil
+}
+
+func GenerateAlertDict(alerts []models.Alert, tmplstr string) (string, error) {
 	tmpl, err := template.New("detail").Parse(tmplstr)
 	if err != nil {
 		return "", err
@@ -27,40 +47,55 @@ func Generate(alerts map[string][]models.Alert, tmplstr string) (string, error) 
 	return string(buf.Bytes()), nil
 }
 
-const templateUS = `package alert
+const templateCveUS = `package alert
 
-var AlertDictUS = map[string][]AlertGolang {
+var CveDictUS = map[string][]string {
 {{range $cveID, $alerts := .}}
-    "{{$cveID}}" : { {{range $alert := . -}}
-        {
-	        CveID       : "{{$cveID}}",
-	        URL         : "{{$alert.URL}}",
-            Title       : "{{$alert.Title}}",
-	        Team        : "us",
-        },{{end}}
-    },{{end}}
+    "{{$cveID}}" : { {{range $alert := . -}}"{{$alert.URL}}",{{end}}},{{end}}
 }
 `
 
-const templateJP = `package alert
+const templateCveJP = `package alert
+
+var CveDictJP = map[string][]string {
+{{range $cveID, $alerts := .}}
+    "{{$cveID}}" : { {{range $alert := . -}}"{{$alert.URL}}",{{end}} },{{end}}
+}
+`
+
+const templateAlertJP = `package alert
 
 // Alert has XCERT alert information
-type AlertGolang struct {
-	CveID       string
+type Alert struct {
 	URL         string
 	Title       string
 	Team        string
 }
 
-var AlertDictJP = map[string][]AlertGolang {
-{{range $cveID, $alerts := .}}
-    "{{$cveID}}" : { {{range $alert := . -}}
+var AlertDictJP = map[string][]Alert {
+{{range $alert := . -}}
+    "{{$alert.URL}}" : { 
         {
-	        CveID       : "{{$cveID}}",
 	        URL         : "{{$alert.URL}}",
-            Title       : "{{$alert.Title}}",
+            Title       :  ` + "`" + `{{$alert.Title}}` + "`" + `,
 	        Team        : "jp",
-        },{{end}}
-    },{{end}}
+        },
+    },
+{{end}}
+}
+`
+
+const templateAlertUS = `package alert
+
+var AlertDictUS = map[string][]Alert {
+{{range $alert := . -}}
+    "{{$alert.URL}}" : { 
+        {
+	        URL         : "{{$alert.URL}}",
+            Title       :  ` + "`" + `{{$alert.Title}}` + "`" + `,
+	        Team        : "us",
+        },
+    },
+{{end}}
 }
 `

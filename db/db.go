@@ -13,7 +13,8 @@ type DB interface {
 	OpenDB(string, string, bool) (bool, error)
 	MigrateDB() error
 	InsertAlert([]models.Alert) error
-	GetAfterTimeJpcert(time.Time) ([]models.Alert, error)
+	GetAfterTimeAlerts(time.Time) ([]models.Alert, error)
+	GetTargetTeamAlerts(string) ([]models.Alert, error)
 	GetAlertsByCveId(string) ([]models.Alert, error)
 	GetAllAlertsCveIdKeyByTeam(string) (map[string][]models.Alert, error)
 }

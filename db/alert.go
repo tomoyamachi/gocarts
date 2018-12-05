@@ -19,6 +19,14 @@ func (r *RDBDriver) GetAlertsByCveId(cveId string) (allAlerts []models.Alert, er
 	return returnRelatedAlertsByCVEs(r, refs)
 }
 
+// Fetch all alerts by team
+func (r *RDBDriver) GetTargetTeamAlerts(team string) (allAlerts []models.Alert, err error) {
+	if err = r.conn.Where("team = ?", team).Find(&allAlerts).Error; err != nil {
+		return nil, err
+	}
+	return allAlerts, nil
+}
+
 func (r *RDBDriver) GetAllAlertsCveIdKeyByTeam(team string) (alertsMap map[string][]models.Alert, err error) {
 	refs := []models.Cve{}
 	// alert_id's first char is depend on TEAM. check util.CreateID
